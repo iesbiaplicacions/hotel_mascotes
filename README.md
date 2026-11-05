@@ -33,7 +33,7 @@ Segueix aquests passos per a aixecar el projecte en entorn local:
 
 1. **Clona el repositori:**
    ```bash
-   git clone https://github.com
+   git clone https://github.com/iesbiaplicacions/hotel_mascotes.git
    cd hotel_mascotes
    ```
 
