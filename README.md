@@ -60,7 +60,7 @@ Segueix aquests passos per a aixecar el projecte en entorn local:
      --name mongodb_hotel_mascotes \
      -p 27017:27017 \
      -e MONGO_INITDB_ROOT_USERNAME=admin \
-     -e MONGO_INITDB_ROOT_PASSWORD=la_teva_clau_secreta_aqui \
+     -e MONGO_INITDB_ROOT_PASSWORD=admin \
      -v mongo_data_mascotes:/data/db \
      mongo:latest
    ```
