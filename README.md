@@ -70,7 +70,7 @@ Segueix aquests passos per a aixecar el projecte en entorn local:
 Per iniciar el servidor de desenvolupament, executa la comanda principal de la teva solució (per exemple, amb Uvicorn si utilitzes FastAPI):
 
 ```bash
-uvicorn app.main:app --reload
+uvicorn app.main:app --reload --host 0.0.0.0
 ```
 *Nota: Ajusta la comanda anterior si el teu fitxer d'entrada principal té un altre nom (ex. `python run.py` o `flask run`).*
 
