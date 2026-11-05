@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐾 Hotel de Mascotes - panell de control</title>
+    <!-- Tailwind CSS per a un disseny modern i ràpid -->
+    <script src="https://tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+
+    <div class="container mx-auto p-6 max-w-4xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-4xl font-bold text-indigo-600 mb-2">🐾 Hotel de Mascotes</h1>
+            <p class="text-gray-600">Gestió del registre de residents animals</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Formular per afegir mascotes -->
+            <div class="bg-white p-6 rounded-lg shadow-md md:col-span-1">
+                <h2 class="text-xl font-bold mb-4 text-gray-700">Afegir Mascota</h2>
+                <form id="petForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Nom</label>
+                        <input type="text" id="name" required class="w-full border rounded px-3 py-2 focus:outline-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Espècie / Raça</label>
+                        <input type="text" id="breed" placeholder="Ex: Gos (Golden Retriever)" required class="w-full border rounded px-3 py-2 focus:outline-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Edat</label>
+                        <input type="number" id="age" required class="w-full border rounded px-3 py-2 focus:outline-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Necessitats especials</label>
+                        <textarea id="notes" class="w-full border rounded px-3 py-2 focus:outline-indigo-500" placeholder="Medicació, al·lèrgies..."></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded transition">Registrar</button>
+                </form>
+            </div>
+
+            <!-- Llistat de mascotes -->
+            <div class="bg-white p-6 rounded-lg shadow-md md:col-span-2">
+                <h2 class="text-xl font-bold mb-4 text-gray-700">Animals allotjats</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 border-b">
+                                <th class="p-3 font-semibold text-sm">Nom</th>
+                                <th class="p-3 font-semibold text-sm">Raça/Espècie</th>
+                                <th class="p-3 font-semibold text-sm">Edat</th>
+                                <th class="p-3 font-semibold text-sm">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="petTableBody">
+                            <!-- El JavaScript omplirà les files aquí -->
+                            <tr>
+                                <td colspan="4" class="p-4 text-center text-gray-500">Carregant dades del registre...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Canvia la URL si el teu Killercoda utilitza un port diferent de l'estàndard local.
+        const API_URL = window.location.origin + '/pets'; 
+
+        // Funció per carregar totes les mascotes des de l'API backend
+        async function loadPets() {
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('Error de xarxa');
+                const pets = await response.json();
+                
+                const tableBody = document.getElementById('petTableBody');
+                tableBody.innerHTML = '';
+
+                if (pets.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">No hi ha cap mascota registrada actualment.</td></tr>`;
+                    return;
+                }
+
+                pets.forEach(pet => {
+                    const row = document.createElement('tr');
+                    row.className = 'border-b hover:bg-gray-50 transition';
+                    row.innerHTML = `
+                        <td class="p-3 font-medium">${pet.name}</td>
+                        <td class="p-3 text-gray-600">${pet.breed || pet.species || 'Desconeguda'}</td>
+                        <td class="p-3">${pet.age} anys</td>
+                        <td class="p-3 text-xs text-gray-500">${pet.notes || pet.special_needs || 'Cap'}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error("Error carregant mascotes:", error);
+                document.getElementById('petTableBody').innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-500 font-semibold">No s'ha pogut connectar amb la base de dades.</td></tr>`;
+            }
+        }
+
+        // Enviar nova mascota al backend en prémer el botó
+        document.getElementById('petForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const newPet = {
+                name: document.getElementById('name').value,
+                breed: document.getElementById('breed').value,
+                age: parseInt(document.getElementById('age').value),
+                notes: document.getElementById('notes').value
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newPet)
+                });
+
+                if (response.ok) {
+                    document.getElementById('petForm').reset();
+                    loadPets(); // Actualitza la llista a l'instant
+                } else {
+                    alert("Error en desar la mascota a l'API");
+                }
+            } catch (error) {
+                console.error("Error al desar:", error);
+                alert("No s'ha pogut comunicar amb el servidor.");
+            }
+        });
+
+        // Carrega inicial en obrir la pàgina
+        loadPets();
+    </script>
+</body>
+</html>
